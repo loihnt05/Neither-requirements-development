@@ -1,0 +1,23 @@
+{
+  "name": "taloi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "pnpm exec tsx src/main.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1",
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "@types/node": "^25.0.10",
+    "tsx": "^4.21.0"
+  },
+  "dependencies": {
+    "ai": "^6.0.49",
+    "openai": "^6.16.0",
+    "playwright": "^1.58.0"
+  }
+}
