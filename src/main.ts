@@ -1,5 +1,7 @@
-import { chromium, devices, Page, Browser, BrowserContext } from "playwright";
+import { chromium, devices } from "playwright";
 import OpenAI from "openai";
+import dotenv from "dotenv";
+dotenv.config();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // Ideally use process.env.OPENAI_API_KEY
