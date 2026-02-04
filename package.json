@@ -12,13 +12,14 @@
   "packageManager": "pnpm@10.13.1",
   "devDependencies": {
     "@playwright/test": "^1.58.0",
-    "@types/node": "^25.0.10",
+    "@types/node": "^25.1.0",
     "tsx": "^4.21.0"
   },
   "dependencies": {
-    "ai": "^6.0.49",
+    "ai": "^6.0.62",
     "dotenv": "^17.2.3",
-    "openai": "^6.16.0",
-    "playwright": "^1.58.0"
+    "openai": "^6.17.0",
+    "playwright": "^1.58.0",
+    "playwright-recaptcha-solver": "git+https://github.com/xrip/puppeteer-recaptcha-solver.git"
   }
 }
