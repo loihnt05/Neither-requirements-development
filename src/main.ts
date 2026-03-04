@@ -187,27 +187,64 @@ async function main() {
   });
   const page = await context.newPage();
   await page.goto("https://tructuyen.sjc.com.vn/dang-nhap");
-  await page.getByPlaceholder("Nhập họ tên").fill("Hò Thị Ngân Huyền");
+  await page.getByPlaceholder("Nhập họ tên").fill("Hồ Thị Ngân Huyền");
   await page.getByPlaceholder("Nhập CCCD").fill("086196009296");
   await page.getByRole("button", { name: "Đăng nhập" }).click();
 
   await page.locator("#select2-id_area-container").click();
   await page.getByRole('option', { name: 'Thành phố Hồ Chí Minh' }).click();
-  await page.locator("#select2-id_store-container").click();
-  await page.getByRole('option', { name: 'TRỤ SỞ - TRUNG TÂM VÀNG BẠC ĐÁ QUÝ - SJC' }).click();
-  // await page.selectOption("select2-id_store-container", { label: "TRUNG TÂM VÀNG BẠC ĐÁ QUÝ SJC GÒ VẤP"})
-  
-  // await page.locator("#select2-id_hinhthuc-container").click();
-  // await page.getByRole("option", {name: 'Tiền mặt'}).click();
 
-  // Wait for the reCAPTCHA anchor iframe to appear
-  await page.waitForSelector('iframe[src*="recaptcha"][src*="anchor"]', { timeout: 0 });
+  const stores = [
+    'TRỤ SỞ - TRUNG TÂM VÀNG BẠC ĐÁ QUÝ - SJC',
+    'TRUNG TÂM VÀNG BẠC ĐÁ QUÝ SJC GÒ VẤP',
+  ];
 
-  // Solve the reCAPTCHA audio challenge (click PHÁT → Whisper → verify)
-  await solveRecaptchaAudio(page);
+  let registered = false;
+  for (const store of stores) {
+    console.log(`Trying store: ${store}`);
 
-  // Click the Đăng ký (Register) button
-  await page.getByRole('button', { name: 'Đăng ký' }).click();
+    // Select the store
+    await page.locator("#select2-id_store-container").click();
+    await page.getByRole('option', { name: store }).click();
+
+    // Wait for reCAPTCHA and solve it
+    await page.waitForSelector('iframe[src*="recaptcha"][src*="anchor"]', { timeout: 0 });
+    await solveRecaptchaAudio(page);
+
+    // Submit the form
+    await page.getByRole('button', { name: 'Đăng ký' }).click();
+
+    // Wait briefly then check for a failure indicator (error toast / alert)
+    await page.waitForTimeout(2000);
+
+    const failed = await page.evaluate(() => {
+      // Check for common error indicators: visible alert, toast, or error message
+      const selectors = [
+        '.alert-danger',
+        '.error-message',
+        '.notification-error',
+        '[class*="error"]',
+        '[class*="alert"]',
+      ];
+      for (const sel of selectors) {
+        const el = document.querySelector(sel) as HTMLElement | null;
+        if (el && el.offsetParent !== null && el.innerText.trim().length > 0) return true;
+      }
+      return false;
+    });
+
+    if (!failed) {
+      console.log(`Registration succeeded with store: ${store}`);
+      registered = true;
+      break;
+    }
+
+    console.log(`Registration failed for store: ${store}, trying next option...`);
+  }
+
+  if (!registered) {
+    throw new Error('Registration failed for all store options');
+  }
   // await page.getByPlaceholder("Vui lòng nhập điện thoại").fill("0123456789");
   // await page.selectOption("#id_province", { label: "Thành phố Hồ Chí Minh" });
   // await page.selectOption("#id_district", { label: "Quận 10" });
